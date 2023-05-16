@@ -1,0 +1,15 @@
+{{- with .Values.additionalOutputs.fluentd }}
+{{- $auth := (or (and .user .password) .sharedKey) }}
+{{- if and .host .port $auth .tlsVerify .caCert}}
+apiVersion: v1
+kind: Secret
+metadata:
+  name: external-fluentd-ca-cert
+  namespace: {{ $.Release.Namespace }}
+  labels:
+    {{- include "fluent-bit.labels" $ | nindent 4 }}
+type: Opaque
+data:
+  ca.crt: {{ .caCert | b64enc }}
+{{- end }}
+{{- end }}
