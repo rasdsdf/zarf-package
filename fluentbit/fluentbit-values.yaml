@@ -1,0 +1,739 @@
+# BigBang specific values for fluent-bit.
+#
+# -- Configuration for Elasticsearch interaction
+elasticsearch:
+  # -- Name is only used at the BB level for host templating
+  name: ""
+
+# -- Configuration for Istio interaction
+istio:
+  # -- Toggle currently only controls NetworkPolicies
+  enabled: false
+  # -- Default peer authentication setting
+  mtls:
+    # -- STRICT = Allow only mutual TLS traffic
+    # PERMISSIVE = Allow both plain text and mutual TLS traffic
+    mode: STRICT
+
+# -- Additional Outputs for Big Bang,
+# these are wrappers to simplify the config of outputs and
+# extend whatever is specified under the `outputs` values
+additionalOutputs:
+  # -- Option to disable the default elastic output configured under `outputs`,
+  # this only works at the Big Bang chart level
+  disableDefault: false
+  # -- Options to enable an additional elastic output
+  elasticsearch:
+    host: ""
+    port: 9200
+    user: "elastic"
+    password: ""
+    # -- Toggle on TLS
+    tls: true
+    # -- Verify TLS certificates, requires a caCert to be specified
+    tlsVerify: false
+    # -- Full ca.crt specified as multiline string, see example
+    caCert: ""
+    # caCert: |
+    # /  -----BEGIN CERTIFICATE-----
+    #   MIIE4jCCAsqgAwIBAgIBATANBgkqhkiG9w0BAQsFADARMQ8wDQYDVQQDEwZzZm8t
+    #   Y2EwHhcNMTkxMjIwMDAxNjI1WhcNMjEwNjIwMDAxNjIxWjARMQ8wDQYDVQQDEwZz
+    # /  -----END CERTIFICATE-----
+    # -- Reference configuration parameters provided by Fluentbit - https://docs.fluentbit.io/manual/pipeline/outputs/elasticsearch
+    additionalConfig: {}
+    # Customer values are used for: Name, Host, Port, HTTP_User, HTTP_Passwd, tls, tls.verify, and tls.ca_file
+    #   Specify these values with the above host, port, user, password, tls, tlsVerify, and caCert
+    # Defaults are set for: Match, Logstash_Format, Logstash_Prefix, Retry_Limit, Retry_Limit
+    #   Overriding these values is not supported here, use `outputs` if you do not want to use the defaults
+    # Example:
+    #   Buffer_Size: 8KB
+  # -- Options to enable a fluentd output
+  fluentd:
+    host: ""
+    port: 24224
+    user: ""
+    password: ""
+    # -- Overriden by username and password
+    sharedKey: ""
+    # -- Toggle on TLS
+    tls: true
+    # -- Verify TLS certificates, requires a caCert to be specified
+    tlsVerify: false
+    # -- Full ca.crt specified as multiline string, see example
+    caCert: ""
+    # caCert: |
+    # /  -----BEGIN CERTIFICATE-----
+    #   MIIE4jCCAsqgAwIBAgIBATANBgkqhkiG9w0BAQsFADARMQ8wDQYDVQQDEwZzZm8t
+    #   Y2EwHhcNMTkxMjIwMDAxNjI1WhcNMjEwNjIwMDAxNjIxWjARMQ8wDQYDVQQDEwZz
+    # /  -----END CERTIFICATE-----
+    # -- Reference configuration parameters provided by Fluentbit - https://docs.fluentbit.io/manual/pipeline/outputs/forward
+    additionalConfig: {}
+    # Customer values are used for: Time_as_Integer, Upstream, Tag, Send_options, Require_ack_response, Compress, Empty_Shared_Key, Self_Hostname, tls.debug, tls.crt_file, tls.key_file, tls.key_passwd
+    #   Specify these values with the above host, port, user, password, tls, tlsVerify, and caCert
+    # Defaults are set for: Name, Match, Host, Port, Username, Password, Shared_Key, tls, tls.verify, tls.ca_file
+    # Example:
+    #   Self_Hostname: "custom_value"
+  # -- Options to enable a loki output
+  loki:
+    host: ""
+    port: 3100
+    # -- User and Password are optional - only required if running proxy in front of Loki,
+    # see https://grafana.com/docs/loki/latest/operations/authentication/
+    user: ""
+    password: ""
+    # -- Toggle on TLS - disabled by default to support in cluster Loki
+    tls: false
+    # -- Verify TLS certificates, requires a caCert to be specified
+    tlsVerify: false
+    # -- Full ca.crt specified as multiline string, see example
+    caCert: ""
+    # caCert: |
+    # /  -----BEGIN CERTIFICATE-----
+    #   MIIE4jCCAsqgAwIBAgIBATANBgkqhkiG9w0BAQsFADARMQ8wDQYDVQQDEwZzZm8t
+    #   Y2EwHhcNMTkxMjIwMDAxNjI1WhcNMjEwNjIwMDAxNjIxWjARMQ8wDQYDVQQDEwZz
+    # /  -----END CERTIFICATE-----
+    # -- Reference configuration parameters provided by Fluentbit - https://docs.fluentbit.io/manual/pipeline/outputs/loki
+    additionalConfig: {}
+    # Customer values are used for: host, post, http_user, http_passwd, tls, tls.verify, and tls.ca_file
+    #   Specify these values with the above host, port, user, password, tls, tlsVerify, and caCert
+    # Defaults are provided for Name, Match, Retry_Limit, and auto_kubernetes_labels
+    #   Overriding these values is not supported here, use `outputs` if you do not want to use the defaults
+    # Example:
+    #   tenant_id: "custom_value"
+  # -- Options to enable a S3 output
+  s3:
+    bucket: ""
+    region: "us-east-1"
+    match:
+      - "kube.*"
+      - "host.*"
+    aws_access_key_id: ""
+    aws_secret_access_key: ""
+    # -- Reference an existing secret with your access and secret key,
+    # must contain key values pairs for AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY
+    existingSecret: ""
+    # -- Reference configuration parameters provided by Fluentbit - https://docs.fluentbit.io/manual/pipeline/outputs/s3
+    additionalConfig:
+      total_file_size: 1M
+      upload_timeout: 1m
+      use_put_object: On
+    # Defaults are set for: Name, Match, bucket, region
+    # For other custom values, checkout the plugin link above
+    # Example:
+    #   role_arn: "custom_value"
+
+# -- Options to configure hostPath mounted storage buffer for production use
+# Specified in fluentbit service configuration section below
+# see https://docs.fluentbit.io/manual/administration/buffering-and-storage
+storage_buffer:
+  path: /var/log/flb-storage/
+
+# -- Limits the number of Chunks that exists in the file system for a certain logical output destination.
+# If one destination reaches the storage.total_limit_size limit, the oldest Chunk from the queue for that logical output destination will be discarded.
+# see https://docs.fluentbit.io/manual/administration/buffering-and-storage
+storage:
+  total_limit_size: 10G
+
+# Default values for fluent-bit.
+
+# kind -- DaemonSet or Deployment
+kind: DaemonSet
+
+# replicaCount -- Only applicable if kind=Deployment
+replicaCount: 1
+
+image:
+  repository: registry1.dso.mil/ironbank/opensource/fluent/fluent-bit
+  pullPolicy: Always
+  tag: 2.1.2
+
+networkPolicies:
+  enabled: false
+  # See `kubectl cluster-info` and then resolve to IP
+  controlPlaneCidr: 0.0.0.0/0
+
+testFramework:
+  enabled: false
+  image:
+    repository: busybox
+    pullPolicy: Always
+    tag: latest
+
+imagePullSecrets:
+- name: private-registry
+
+nameOverride: "fluent-bit"
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name:
+
+rbac:
+  create: true
+  nodeAccess: false
+
+# Configure podsecuritypolicy
+# Ref: https://kubernetes.io/docs/concepts/policy/pod-security-policy/
+# from Kubernetes 1.25, PSP is deprecated
+# See: https://kubernetes.io/blog/2022/08/23/kubernetes-v1-25-release/#pod-security-changes
+# We automatically disable PSP if Kubernetes version is 1.25 or higher
+podSecurityPolicy:
+  create: false
+  annotations: {}
+
+openShift:
+  # Sets Openshift support
+  enabled: false
+  # Creates SCC for Fluent-bit when Openshift support is enabled
+  securityContextConstraints:
+    create: true
+    annotations: {}
+
+podSecurityContext: {}
+#   fsGroup: 2000
+
+hostNetwork: false
+dnsPolicy: ClusterFirst
+
+dnsConfig: {}
+#   nameservers:
+#     - 1.2.3.4
+#   searches:
+#     - ns1.svc.cluster-domain.example
+#     - my.dns.search.suffix
+#   options:
+#     - name: ndots
+#       value: "2"
+#     - name: edns0
+
+hostAliases: []
+  # - ip: "1.2.3.4"
+  #   hostnames:
+  #   - "foo.local"
+  #   - "bar.local"
+
+securityContext:
+  runAsUser: 0
+  readOnlyRootFilesystem: true
+  privileged: false
+  seLinuxOptions:
+    type: spc_t
+  capabilities:
+    drop:
+      - ALL
+
+
+service:
+  type: ClusterIP
+  port: 2020
+  loadBalancerClass:
+  loadBalancerSourceRanges: []
+  labels: {}
+  # nodePort: 30020
+  # clusterIP: 172.16.10.1
+  annotations: {}
+#   prometheus.io/path: "/api/v1/metrics/prometheus"
+#   prometheus.io/port: "2020"
+#   prometheus.io/scrape: "true"
+
+serviceMonitor:
+  enabled: false
+#   namespace: monitoring
+#   interval: 10s
+#   scrapeTimeout: 10s
+#   jobLabel: fluentbit
+#   selector:
+#    prometheus: my-prometheus
+#  ## metric relabel configs to apply to samples before ingestion.
+#  ##
+#  metricRelabelings:
+#    - sourceLabels: [__meta_kubernetes_service_label_cluster]
+#      targetLabel: cluster
+#      regex: (.*)
+#      replacement: ${1}
+#      action: replace
+#  ## relabel configs to apply to samples after ingestion.
+#  ##
+#  relabelings:
+#    - sourceLabels: [__meta_kubernetes_pod_node_name]
+#      separator: ;
+#      regex: ^(.*)$
+#      targetLabel: nodename
+#      replacement: $1
+#      action: replace
+#  scheme: ""
+#  tlsConfig: {}
+
+  ## Beare in mind if youn want to collec metrics from a different port
+  ## you will need to configure the new ports on the extraPorts property.
+  additionalEndpoints: []
+  # - port: metrics
+  #   path: /metrics
+  #   interval: 10s
+  #   scrapeTimeout: 10s
+  #   scheme: ""
+  #   tlsConfig: {}
+  #   # metric relabel configs to apply to samples before ingestion.
+  #   #
+  #   metricRelabelings:
+  #     - sourceLabels: [__meta_kubernetes_service_label_cluster]
+  #       targetLabel: cluster
+  #       regex: (.*)
+  #       replacement: ${1}
+  #       action: replace
+  #   # relabel configs to apply to samples after ingestion.
+  #   #
+  #   relabelings:
+  #     - sourceLabels: [__meta_kubernetes_pod_node_name]
+  #       separator: ;
+  #       regex: ^(.*)$
+  #       targetLabel: nodename
+  #       replacement: $1
+  #       action: replace
+
+prometheusRule:
+  enabled: false
+#   namespace: ""
+  additionalLabels: {}
+# Rules to be deployed
+  rules:
+  - alert: fluentbitJobAbsent
+    annotations:
+      message: "Fluent Bit job not present for 10m"
+    expr: absent(up{job="fluentbit", namespace="logging"})
+    for: 10m
+    labels:
+      severity: critical
+  - alert: FluentdLowNumberOfPods
+    expr: |-
+      avg without (instance) (up{job="fluentbit"}) < .20
+    for: 10m
+    annotations:
+    labels:
+      severity: critical
+  - alert: LogsNotFlowing
+    expr: |-
+      sum(rate(fluentd_output_status_num_records_total{}[4h])) by (tag) < .001
+    for: 30m
+    annotations:
+    labels:
+      severity: critical
+  - alert: NoOutputBytesProcessed
+    expr: rate(fluentbit_output_proc_bytes_total[5m]) == 0
+    annotations:
+      message: |
+        Fluent Bit instance {{ $labels.instance }}'s output plugin {{ $labels.name }} has not processed any
+        bytes for at least 15 minutes.
+    for: 15m
+    labels:
+      severity: critical
+
+
+dashboards:
+  enabled: false
+  # namespace: monitoring
+  labelKey: grafana_dashboard
+  labelValue: 1
+  annotations: {}
+
+lifecycle: {}
+  # preStop:
+  #   exec:
+  #     command: ["/bin/sh", "-c", "sleep 20"]
+
+livenessProbe:
+  httpGet:
+    path: /
+    port: http
+
+readinessProbe:
+  httpGet:
+    path: /api/v1/health
+    port: http
+
+resources: {}
+#   limits:
+#     cpu: 100m
+#     memory: 128Mi
+#   requests:
+#     cpu: 100m
+#     memory: 128Mi
+
+## only available if kind is Deployment
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts: []
+  # - host: fluent-bit.example.tld
+  extraHosts: []
+  # - host: fluent-bit-extra.example.tld
+      ## specify extraPort number
+  #   port: 5170
+  tls: []
+  #  - secretName: fluent-bit-example-tld
+  #    hosts:
+  #      - fluent-bit.example.tld
+
+## only available if kind is Deployment
+autoscaling:
+  vpa:
+    enabled: false
+
+    annotations: {}
+
+    # List of resources that the vertical pod autoscaler can control. Defaults to cpu and memory
+    controlledResources: []
+
+    # Define the max allowed resources for the pod
+    maxAllowed: {}
+    # cpu: 200m
+    # memory: 100Mi
+    # Define the min allowed resources for the pod
+    minAllowed: {}
+    # cpu: 200m
+    # memory: 100Mi
+
+    updatePolicy:
+      # Specifies whether recommended updates are applied when a Pod is started and whether recommended updates
+      # are applied during the life of a Pod. Possible values are "Off", "Initial", "Recreate", and "Auto".
+      updateMode: Auto
+
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 3
+  targetCPUUtilizationPercentage: 75
+#  targetMemoryUtilizationPercentage: 75
+   ## see https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale-walkthrough/#autoscaling-on-multiple-metrics-and-custom-metrics
+  customRules: []
+#     - type: Pods
+#       pods:
+#         metric:
+#           name: packets-per-second
+#         target:
+#           type: AverageValue
+#           averageValue: 1k
+    ## see https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/#support-for-configurable-scaling-behavior
+  behavior: {}
+#      scaleDown:
+#        policies:
+#          - type: Pods
+#            value: 4
+#            periodSeconds: 60
+#          - type: Percent
+#            value: 10
+#            periodSeconds: 60
+
+## only available if kind is Deployment
+podDisruptionBudget:
+  enabled: false
+  annotations: {}
+  maxUnavailable: "30%"
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+labels: {}
+
+annotations: {}
+
+podAnnotations: {}
+
+podLabels: {}
+#  traffic.sidecar.istio.io/excludeOutboundPorts: "443"
+
+## How long (in seconds) a pods needs to be stable before progressing the deployment
+##
+minReadySeconds:
+
+## How long (in seconds) a pod may take to exit (useful with lifecycle hooks to ensure lb deregistration is done)
+##
+terminationGracePeriodSeconds:
+
+priorityClassName: ""
+
+env: {}
+
+envFrom: []
+
+extraContainers: []
+#   - name: do-something
+#     image: busybox
+#     command: ['do', 'something']
+
+flush: 1
+
+metricsPort: 2020
+
+extraPorts: []
+#   - port: 5170
+#     containerPort: 5170
+#     protocol: TCP
+#     name: tcp
+#     nodePort: 30517
+
+extraVolumes:
+# -- Mount /var/log/flb-storage/ for the storage buffer, recommended for production systems.
+  - hostPath:
+      path: /var/log/flb-storage/
+      type: DirectoryOrCreate
+    name: flb-storage
+
+extraVolumeMounts:
+# -- Mount /var/log/flb-storage/ for the storage buffer, recommended for production systems.
+  - mountPath: /var/log/flb-storage/
+    name: flb-storage
+    readOnly: false
+
+updateStrategy: {}
+#   type: RollingUpdate
+#   rollingUpdate:
+#     maxUnavailable: 1
+
+# Make use of a pre-defined configmap instead of the one templated here
+existingConfigMap: ""
+
+networkPolicy:
+  enabled: false
+#   ingress:
+#     from: []
+
+luaScripts: {}
+
+## https://docs.fluentbit.io/manual/administration/configuring-fluent-bit/classic-mode/configuration-file
+config:
+  service: |
+    [SERVICE]
+        Daemon Off
+        Flush {{ .Values.flush }}
+        Log_Level {{ .Values.logLevel }}
+        Parsers_File parsers.conf
+        Parsers_File custom_parsers.conf
+        HTTP_Server On
+        HTTP_Listen 0.0.0.0
+        HTTP_Port {{ .Values.metricsPort }}
+        # -- Setting up storage buffer on filesystem and slighty upping backlog mem_limit value.
+        storage.path {{ .Values.storage_buffer.path }}
+        storage.sync normal
+        storage.backlog.mem_limit 15M
+        Health_Check On
+
+  ## https://docs.fluentbit.io/manual/pipeline/inputs
+  inputs: |
+    [INPUT]
+        Name tail
+        Path /var/log/containers/*.log
+        # -- Excluding fluentbit logs from sending to ECK, along with gatekeeper-audit logs which are shipped by clusterAuditor.
+        Exclude_Path /var/log/containers/*fluent*.log
+        Parser containerd
+        Tag kube.*
+        Mem_Buf_Limit 50MB
+        Skip_Long_Lines On
+        storage.type filesystem
+
+    [INPUT]
+        Name systemd
+        Tag host.*
+        Systemd_Filter _SYSTEMD_UNIT=kubelet.service
+        Read_From_Tail On
+        storage.type filesystem
+
+  ## https://docs.fluentbit.io/manual/pipeline/filters
+  filters: |
+    [FILTER]
+        Name kubernetes
+        Match kube.*
+        Kube_CA_File /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+        Kube_Token_File /var/run/secrets/kubernetes.io/serviceaccount/token
+        Merge_Log On
+        Merge_Log_Key log_processed
+        K8S-Logging.Parser On
+        K8S-Logging.Exclude Off
+        Buffer_Size 1M
+
+  ## https://docs.fluentbit.io/manual/pipeline/outputs
+  outputs: ""
+  # Example:
+  # outputs: |
+  #   [OUTPUT]
+  #       Name es
+  #       Match kube.*
+  #       # -- Pointing to Elasticsearch service installed by ECK, based off EK name "logging-ek", update elasticsearch.name above to update.
+  #       Host {{ .Values.elasticsearch.name }}-es-http
+  #       HTTP_User elastic
+  #       HTTP_Passwd ${FLUENT_ELASTICSEARCH_PASSWORD}
+  #       Logstash_Format On
+  #       Retry_Limit False
+  #       Replace_Dots On
+  #       tls On
+  #       tls.verify On
+  #       tls.ca_file /etc/elasticsearch/certs/ca.crt
+  #       storage.total_limit_size {{ .Values.storage.total_limit_size }}
+
+  ## https://docs.fluentbit.io/manual/administration/configuring-fluent-bit/classic-mode/upstream-servers
+  ## This configuration is deprecated, please use `extraFiles` instead.
+  upstream: {}
+
+  ## https://docs.fluentbit.io/manual/pipeline/parsers
+  customParsers: |
+    [PARSER]
+        Name docker_no_time
+        Format json
+        Time_Keep Off
+        Time_Key time
+        Time_Format %Y-%m-%dT%H:%M:%S.%L
+
+    [PARSER]
+        Name containerd
+        Format regex
+        Regex ^(?<time>[^ ]+) (?<stream>stdout|stderr) (?<logtag>[^ ]*) (?<log>.*)$
+        Time_Key time
+        Time_Format %Y-%m-%dT%H:%M:%S.%L%z
+        Time_Keep On
+
+    [PARSER]
+        Name   apache
+        Format regex
+        Regex  ^(?<host>[^ ]*) [^ ]* (?<user>[^ ]*) \[(?<time>[^\]]*)\] "(?<method>\S+)(?: +(?<path>[^\"]*?)(?: +\S*)?)?" (?<code>[^ ]*) (?<size>[^ ]*)(?: "(?<referer>[^\"]*)" "(?<agent>[^\"]*)")?$
+        Time_Key time
+        Time_Format %d/%b/%Y:%H:%M:%S %z
+
+    [PARSER]
+        Name   apache2
+        Format regex
+        Regex  ^(?<host>[^ ]*) [^ ]* (?<user>[^ ]*) \[(?<time>[^\]]*)\] "(?<method>\S+)(?: +(?<path>[^ ]*) +\S*)?" (?<code>[^ ]*) (?<size>[^ ]*)(?: "(?<referer>[^\"]*)" "(?<agent>[^\"]*)")?$
+        Time_Key time
+        Time_Format %d/%b/%Y:%H:%M:%S %z
+
+    [PARSER]
+        Name   apache_error
+        Format regex
+        Regex  ^\[[^ ]* (?<time>[^\]]*)\] \[(?<level>[^\]]*)\](?: \[pid (?<pid>[^\]]*)\])?( \[client (?<client>[^\]]*)\])? (?<message>.*)$
+
+    [PARSER]
+        Name   nginx
+        Format regex
+        Regex ^(?<remote>[^ ]*) (?<host>[^ ]*) (?<user>[^ ]*) \[(?<time>[^\]]*)\] "(?<method>\S+)(?: +(?<path>[^\"]*?)(?: +\S*)?)?" (?<code>[^ ]*) (?<size>[^ ]*)(?: "(?<referer>[^\"]*)" "(?<agent>[^\"]*)")?$
+        Time_Key time
+        Time_Format %d/%b/%Y:%H:%M:%S %z
+
+    [PARSER]
+        Name   json
+        Format json
+        Time_Key time
+        Time_Format %d/%b/%Y:%H:%M:%S %z
+
+    [PARSER]
+        Name        docker
+        Format      json
+        Time_Key    time
+        Time_Format %Y-%m-%dT%H:%M:%S.%L
+        Time_Keep   On
+
+    [PARSER]
+        Name        syslog
+        Format      regex
+        Regex       ^\<(?<pri>[0-9]+)\>(?<time>[^ ]* {1,2}[^ ]* [^ ]*) (?<host>[^ ]*) (?<ident>[a-zA-Z0-9_\/\.\-]*)(?:\[(?<pid>[0-9]+)\])?(?:[^\:]*\:)? *(?<message>.*)$
+        Time_Key    time
+        Time_Format %b %d %H:%M:%S
+
+  # This allows adding more files with arbitary filenames to /fluent-bit/etc by providing key/value pairs.
+  # The key becomes the filename, the value becomes the file content.
+  extraFiles: {}
+#     upstream.conf: |
+#       [UPSTREAM]
+#           upstream1
+#
+#       [NODE]
+#           name       node-1
+#           host       127.0.0.1
+#           port       43000
+#     example.conf: |
+#       [OUTPUT]
+#           Name example
+#           Match foo.*
+#           Host bar
+
+# The config volume is mounted by default, either to the existingConfigMap value, or the default of "fluent-bit.fullname"
+volumeMounts:
+  - name: config
+    mountPath: /fluent-bit/etc/fluent-bit.conf
+    subPath: fluent-bit.conf
+  - name: config
+    mountPath: /fluent-bit/etc/custom_parsers.conf
+    subPath: custom_parsers.conf
+
+daemonSetVolumes:
+  - name: varlog
+    hostPath:
+      path: /var/log
+  - name: varlibdockercontainers
+    hostPath:
+      path: /var/lib/docker/containers
+  - name: etcmachineid
+    hostPath:
+      path: /etc/machine-id
+      type: File
+
+daemonSetVolumeMounts:
+  - name: varlog
+    mountPath: /var/log
+    readOnly: true
+  - name: varlibdockercontainers
+    mountPath: /var/lib/docker/containers
+    readOnly: true
+  - name: etcmachineid
+    mountPath: /etc/machine-id
+    readOnly: true
+
+args: []
+
+command: []
+
+# This supports either a structured array or a templatable string
+initContainers: []
+
+# Array mode
+# initContainers:
+#   - name: do-something
+#     image: bitnami/kubectl:1.22
+#     command: ['kubectl', 'version']
+
+# String mode
+# initContainers: |-
+#   - name: do-something
+#     image: bitnami/kubectl:{{ .Capabilities.KubeVersion.Major }}.{{ .Capabilities.KubeVersion.Minor }}
+#     command: ['kubectl', 'version']
+
+logLevel: info
+
+# -- Toggle for Openshift, currently only controls NetworkPolicy changes
+openshift: false
+
+# -- List of enabled Big Bang log storage package(s), used to control networkPolicies and auth only
+loki:
+  enabled: false
+elasticsearchKibana:
+  enabled: false
+
+# -- Values used for Big Bang CI testing
+bbtests:
+  # -- Toggles test manifests
+  enabled: false
+  # Values used for Big Bang script based testing
+  scripts:
+    # -- Image used to run script tests, must include curl and jq
+    image: registry1.dso.mil/ironbank/stedolan/jq:1.6
+    # -- Envs that are passed into the script runner pod
+    envs:
+      # -- Hostname/port to contact Fluentbit
+      fluent_host: "http://{{ include \"fluent-bit.fullname\" . }}.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.service.port }}"
+      # -- Version that should be running
+      desired_version: "{{ .Values.image.tag }}"
