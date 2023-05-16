@@ -1,0 +1,26 @@
+{{- if .Values.istio.enabled }}
+apiVersion: "security.istio.io/v1beta1"
+kind: PeerAuthentication
+metadata:
+  name: elastic-default
+  namespace: {{ .Release.Namespace }}
+spec:
+  selector:
+    matchLabels:
+      common.k8s.elastic.co/type: elasticsearch
+  mtls:
+    mode: {{ .Values.istio.mtls.mode }}
+  {{- if (eq .Values.istio.mtls.mode "STRICT") }}
+  portLevelMtls:
+    # 9300 is Elastic's transport port and Elastic handles the TLS encryption for it
+    # To prevent double encrypted traffic we exclude 9300 from  sidecar traffic and mTLS
+    "9300":
+      mode: PERMISSIVE
+    {{- if .Values.mattermost.enabled }}
+    # Mattermost conditionally reaches out to Elastic for indexing of chat posts.
+    # MM is not Istio injected currently (4/25/22). This exception should be removed when it is injected.
+    "9200":
+      mode: PERMISSIVE
+    {{- end }}
+  {{- end }}
+{{- end }}
