@@ -1,0 +1,43 @@
+apiVersion: v2
+name: keycloak
+version: 18.4.0-bb.2
+appVersion: 21.0.2
+description: Open Source Identity and Access Management For Modern Applications and Services
+keywords:
+  - sso
+  - idm
+  - openid connect
+  - saml
+  - kerberos
+  - ldap
+home: https://www.keycloak.org/
+icon: https://www.keycloak.org/resources/images/keycloak_icon_512px.svg
+sources:
+  - https://github.com/codecentric/helm-charts
+  - https://github.com/jboss-dockerfiles/keycloak
+  - https://github.com/bitnami/charts/tree/master/bitnami/postgresql
+maintainers:
+  - name: unguiculus
+    email: unguiculus@gmail.com
+  - name: thomasdarimont
+    email: thomas.darimont+github@gmail.com
+dependencies:
+  - name: postgresql
+    version: 10.3.13
+    repository: file://./deps/postgresql
+    condition: postgresql.enabled
+  - name: gluon
+    version: "0.3.2"
+    repository: "oci://registry1.dso.mil/bigbang"
+annotations:
+  bigbang.dev/applicationVersions: |
+    - Keycloak: 21.0.2
+  helm.sh/images: |
+    - name: keycloak
+      image: registry1.dso.mil/ironbank/opensource/keycloak/keycloak:21.0.2
+    - name: postgresl12
+      condition: postgresql.enabled
+      image: registry1.dso.mil/ironbank/opensource/postgres/postgresql12:12.14
+    - name: base
+      condition: bbtests.enabled
+      image: registry1.dso.mil/ironbank/big-bang/base:2.0.0

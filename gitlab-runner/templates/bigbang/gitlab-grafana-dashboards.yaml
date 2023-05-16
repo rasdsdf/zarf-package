@@ -1,0 +1,14 @@
+{{- if .Values.monitoring.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "gitlab-runner-grafana-dashboards"
+  namespace: monitoring
+  labels:
+    grafana_dashboard: "1"
+data:
+  gitlab-ci-pipelines_rev1.json: |
+    {{ .Files.Get "dashboards/gitlab-ci-pipelines_rev1.json"  | nindent 4 }}
+  gitlab-ci-metrics_rev1.json: |
+    {{ .Files.Get "dashboards/gitlab-runner-metrics_rev1.json"  | nindent 4 }}
+{{- end }}

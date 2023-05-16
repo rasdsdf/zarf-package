@@ -1,0 +1,30 @@
+apiVersion: v2
+name: gitlab-runner
+version: 0.51.0-bb.1
+appVersion: v15.10.0
+description: GitLab Runner
+keywords:
+- git
+- ci
+- deploy
+sources:
+- https://gitlab.com/gitlab-org/gitlab-runner
+- https://docs.gitlab.com/runner/
+icon: https://gitlab.com/uploads/-/system/project/avatar/250833/runner_logo.png
+maintainers:
+- name: GitLab Inc.
+  email: support@gitlab.com
+dependencies:
+  - name: gluon
+    version: 0.3.2
+    repository: oci://registry1.dso.mil/bigbang
+annotations:
+  bigbang.dev/applicationVersions: |
+    - Gitlab Runner: v15.10.0
+  helm.sh/images: |
+    - name: gitlab-runner
+      image: registry1.dso.mil/ironbank/gitlab/gitlab-runner/gitlab-runner:v15.10.0
+    - name: gitlab-runner-helper
+      image: registry1.dso.mil/ironbank/gitlab/gitlab-runner/gitlab-runner-helper:v15.10.0
+    - name: ubi8
+      image: registry1.dso.mil/ironbank/redhat/ubi/ubi8:8.7

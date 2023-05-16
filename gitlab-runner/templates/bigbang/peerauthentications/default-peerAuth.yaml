@@ -1,0 +1,12 @@
+{{ if and .Values.istio.enabled (eq .Values.istio.injection "enabled") }}
+{{- if ne .Release.Namespace "gitlab" }}
+apiVersion: security.istio.io/v1beta1
+kind: PeerAuthentication
+metadata:
+  name: default-{{ .Release.Name }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  mtls:
+    mode: {{ .Values.istio.mtls.mode }}
+{{- end }}
+{{- end }}

@@ -1,0 +1,27 @@
+{{- if and .Values.networkPolicies.enabled (ne .Release.Namespace "gitlab") }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: ingress-monitoring-runner-{{ .Release.Name }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  podSelector:
+    matchLabels:
+      app: gitlab-runner
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          app: prometheus 
+      namespaceSelector:
+        matchLabels:
+          app.kubernetes.io/name: monitoring
+    ports:
+    - port: 9252
+      protocol: TCP
+      # for istio sidecar proxy
+    - port: 15020
+      protocol: TCP
+{{- end }}

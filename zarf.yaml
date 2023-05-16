@@ -1,0 +1,92 @@
+kind: ZarfPackageConfig
+metadata:
+  name: zarf
+  version: v0.26.3
+  description: "test zarf package"
+
+components:
+  - name: gitlab
+    description: "used to create pipeline"
+    required: true
+    charts:
+      - name: gitlab
+        url: https://repo1.dso.mil/big-bang/product/packages/gitlab.git
+        version: 6.11.2-bb.0
+        namespace: gitlab
+        valuesFiles:
+          - gitlab-values.yaml
+
+  - name: gitlab-runner
+    description: "used to run pipeline"
+    required: true
+    charts:
+      - name: gitlab-runner
+        url: https://repo1.dso.mil/big-bang/product/packages/gitlab-runner.git
+        version: 15.10.0
+        namespace: gitlab-runner
+        valuesFiles:
+          - gitlab-runner-values.yaml
+  
+  - name: istio
+    description: "used to manage kubernetes"
+    charts:
+      - name: istio
+        url: https://repo1.dso.mil/big-bang/product/packages/istio-controlplane.git
+        version: 1.17.2
+        namespace: istio
+        valuesFiles: 
+          - istio-values.yaml
+
+  - name: istio-operator
+    description: "used to operate istio"
+    charts:
+      - name: istio-operator
+        url: https://repo1.dso.mil/big-bang/product/packages/istio-operator.git
+        version: 1.17.2
+        namespace: istio-operator
+        valuesFiles:
+          - istio-operator-values.yaml
+
+  - name: kiali
+    description: "monitors kubernetes"
+    charts:
+      - name: kiali
+        url: https://repo1.dso.mil/big-bang/product/packages/kiali.git
+        version: v1.66.0
+        namespace: kiali
+        valuesFiles:
+          - kiali-values.yaml
+
+  - name: keycloak
+    description: "open source identity and access management"
+    charts:
+      - name: keycloak
+        url: https://repo1.dso.mil/big-bang/product/packages/keycloak.git
+        version: 21.0.2
+        namespace: keycloak
+        valuesFiles:
+          - keycloak-values.yaml
+
+  - name: fluentbit
+    description: "log processor"
+    charts:
+      - name: fluentbit
+        url: https://repo1.dso.mil/big-bang/product/packages/fluentbit.git
+        version: 2.1.2
+        namespace: fluentbit
+        valuesFiles:
+          - fluentbit-values.yaml
+
+  - name: elasticsearch-kibana
+    description: "analytics engine for all types of data"
+    charts:
+      - name: elasticsearch-kibana
+        url: https://repo1.dso.mil/big-bang/product/packages/elasticsearch-kibana.git
+        version: 8.6.1
+        namespace: elasticsearch-kibana
+        valuesFiles:
+          - elasticsearch-kibana-values.yaml
+
+
+
+

@@ -1,0 +1,11 @@
+apiVersion: kpt.dev/v1alpha1
+kind: Kptfile
+metadata:
+  name: chart
+upstream:
+  type: git
+  git:
+    commit: 9a01d6a1c56f74ba53bf63542ebce909beb76870
+    repo: https://gitlab.com/gitlab-org/charts
+    directory: /gitlab-runner
+    ref: v0.51.0
